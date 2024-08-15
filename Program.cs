@@ -3,11 +3,17 @@ using System.Xml.Linq;
 using AtemXmlConfigurator;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddRazorPages();
 
 var app = builder.Build();
 app.MapRazorPages();
+
+app.MapGet("/", async context =>
+{
+    context.Response.ContentType = "text/html";
+    await context.Response.SendFileAsync("Pages/Index.html");
+});
+
 
 XDocument doc = new XDocument();
 
@@ -60,9 +66,9 @@ app.MapPost("updateConfig", (List<Output> outputs) =>
         }
     }
     
-  var bytes = Encoding.UTF8.GetBytes(doc.ToString());
-  return Results.File(bytes, "application/xml", "config.xml");
-   
+    var bytes = Encoding.UTF8.GetBytes(doc.ToString()); 
+    return Results.File(bytes, "application/xml", $"config-{DateTime.Now:yy-MM-dd-hh-mm-ss}.xml");
+    
 });
 
     

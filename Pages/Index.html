@@ -1,12 +1,4 @@
-@page
-@model AtemXmlConfigurator.Pages.Index
-
-@{
-    Layout = null;
-}
-
 <!DOCTYPE html>
-
 <html>
 <head>
     <title></title>
@@ -17,13 +9,13 @@
     <div id="app">
         <h1>Audio Mapping</h1>
 
-        <form @@submit.prevent="uploadFile">
+        <form @submit.prevent="uploadFile">
             <label for="fileInput">Upload XML File:</label>
-            <input type="file" id="fileInput" @@change="onFileSelected">
+            <input type="file" id="fileInput" @change="onFileSelected">
         </form>
-        <BR><BR><BR>
-        <button @@click="postConfig">Save Config</button>
-        <BR><BR><BR>
+        <BR>        
+        <button @click="postConfig">Save Config</button>
+        <BR>
         <table>
             <thead>
             <tr>
@@ -73,6 +65,7 @@
         methods: {
             onFileSelected(event) {
                 this.selectedFile = event.target.files[0];
+                console.log(this.selectedFile);
                 this.uploadFile();
             },
             uploadFile() {

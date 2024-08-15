@@ -1,0 +1,6 @@
+@AtemXmlConfigurator_HostAddress = http://localhost:5251
+
+GET {{AtemXmlConfigurator_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

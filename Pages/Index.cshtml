@@ -1,0 +1,151 @@
+@page
+@model AtemXmlConfigurator.Pages.Index
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+<div>
+
+    <div id="app">
+        <h1>Audio Mapping</h1>
+
+        <form @@submit.prevent="uploadFile">
+            <label for="fileInput">Upload XML File:</label>
+            <input type="file" id="fileInput" @@change="onFileSelected">
+            <button type="submit">Upload</button>
+        </form>
+        <BR><BR><BR>
+        <button @@click="postConfig">Save Config</button>
+        <BR><BR><BR>
+        <table>
+            <thead>
+            <tr>
+                <th>Output Name</th>
+                <th>Original Source</th>
+                
+                <th>Selected Source</th>
+                <th>Source</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="output in outputs" :key="output.id">
+                <td>{{ output.name }}</td>
+                <td>{{ output.originalSourceName }}</td>
+                <td>{{ output.sourceId }}</td>
+                <td>
+                    <select v-model="output.sourceId">
+                        <option v-for="source in sources" :key="source.id" :value="source.id">
+                            {{ source.name }}
+                        </option>
+                    </select>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+       
+    </div>
+    
+    
+</div>
+</body>
+</html>
+
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script>
+    
+    //load from api lists of outputs and sources
+
+    const app = Vue.createApp({
+        data() {
+            return {
+                sources: [],
+                outputs: [],
+                selectedFile: null
+            };
+        },
+        methods: {
+            onFileSelected(event) {
+                this.selectedFile = event.target.files[0];
+            },
+            uploadFile() {
+                if (!this.selectedFile) {
+                    alert("Please select a file first.");
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append("file", this.selectedFile);
+
+                fetch('uploadXml', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data.sources);
+                        console.log(data.outputs);
+
+                        this.sources = data.sources;
+                        this.outputs = data.outputs;
+
+                        this.outputs.forEach(output => {
+                            output.originalSourceId = output.sourceId;
+                            output.originalSourceName = this.sources.find(s => s.id === output.sourceId).name;
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error uploading file:', error);                       
+                    });
+            },
+        
+            postConfig() {
+                fetch('updateConfig', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(this.outputs)
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            return response.blob();                            
+                            
+                        } else {
+                            alert('Error saving config.');
+                        }
+                    })
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'config.xml';
+                        document.body.appendChild(a);
+                        a.click();
+                        a.remove();
+                        window.URL.revokeObjectURL(url);
+                    })
+                    .catch(error => {
+                        console.error('Error saving config:', error);
+                    });
+            }
+            
+        },
+        mounted() {
+          //  this.loadConfig();
+        }
+    });
+
+    app.mount('#app');
+    
+    
+   
+    
+</script>

@@ -17,4 +17,8 @@
       </None>
     </ItemGroup>
 
+    <ItemGroup>
+        <Watch Include="**\*.html"/>
+    </ItemGroup>
+
 </Project>

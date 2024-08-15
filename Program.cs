@@ -6,9 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddRazorPages();
 
-
 var app = builder.Build();
-
 app.MapRazorPages();
 
 XDocument doc = new XDocument();
@@ -48,27 +46,21 @@ app.MapPost("/uploadXml", async (HttpRequest request) =>
     });
 });
 
+
 app.MapPost("updateConfig", (List<Output> outputs) =>
 {
     foreach (var output in outputs)
     {
-        // Find the corresponding Output element in the XML document
         var outputElement = doc.Descendants("Output")
             .FirstOrDefault(x => x.Attribute("id")?.Value == output.Id);
 
         if (outputElement != null)
         {
-            // Update the sourceId attribute of the Output element
             outputElement.SetAttributeValue("sourceId", output.SourceId);
         }
     }
-
-    // Save the updated XML document
-  //return doc to the client as a XML file
-  
-  //create text stream
+    
   var bytes = Encoding.UTF8.GetBytes(doc.ToString());
-  
   return Results.File(bytes, "application/xml", "config.xml");
    
 });

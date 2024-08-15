@@ -20,7 +20,6 @@
         <form @@submit.prevent="uploadFile">
             <label for="fileInput">Upload XML File:</label>
             <input type="file" id="fileInput" @@change="onFileSelected">
-            <button type="submit">Upload</button>
         </form>
         <BR><BR><BR>
         <button @@click="postConfig">Save Config</button>
@@ -74,13 +73,13 @@
         methods: {
             onFileSelected(event) {
                 this.selectedFile = event.target.files[0];
+                this.uploadFile();
             },
             uploadFile() {
                 if (!this.selectedFile) {
                     alert("Please select a file first.");
                     return;
                 }
-
                 const formData = new FormData();
                 formData.append("file", this.selectedFile);
 
@@ -137,14 +136,10 @@
                     });
             }
             
-        },
-        mounted() {
-          //  this.loadConfig();
         }
     });
 
-    app.mount('#app');
-    
+    app.mount('#app');  
     
    
     
